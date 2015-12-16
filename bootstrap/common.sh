@@ -127,13 +127,17 @@ open_urls() {
 ansible_playbook_run() {
   pushd "${APOLLO_ROOT}"
     get_ansible_inventory
+    install_contributed_roles
     ansible-playbook --inventory-file="${APOLLO_ROOT}/inventory" \
-    ${ANSIBLE_LOG} --extra-vars "consul_atlas_infrastructure=${ATLAS_INFRASTRUCTURE} \
-      consul_atlas_join=true \
-      consul_atlas_token=${ATLAS_TOKEN} \
-      $( get_apollo_variables  APOLLO_)" \
+    ${ANSIBLE_LOG} --extra-vars "$( get_apollo_variables  APOLLO_)" \
     ${ANSIBLE_EXARGS:-} \
     --sudo site.yml
+  popd
+}
+
+install_contributed_roles() {
+  pushd "${APOLLO_ROOT}"
+    ansible-galaxy install --force -r contrib-plugins/plugins.yml
   popd
 }
 
